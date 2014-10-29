@@ -2,18 +2,16 @@
 # XML Extractor
 ## Kyle Scully 2014
 	* Made to extract XML requests from code that builds an XML request
-
 -->
+
 <!DOCTYPE html>
 <html>
 <style>
 
   html {
     height: 100%;
-    /*background = gradient + image pattern combo*/
     background:
-    linear-gradient(rgba(22, 22, 22, 0.7), rgba(39, 177, 218, 0.3) ),
-    url('./images/gpp.png');
+    linear-gradient(rgba(22, 22, 22, 0.7), rgba(39, 177, 218, 0.3) );
   }
 
   body {
@@ -24,37 +22,43 @@
     display: block;
     margin-left: 44%;
     margin-right: auto;
+    width:240px;
   }
-  textarea {
-   display: block;
-   margin-left: auto;
-   margin-right: auto;
-   border-radius: 3px;
-   box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
-   padding: 20px 30px;
- }
- button {
-   display: block;
-   margin-left: auto;
-   margin-right: auto;
-   border-radius: 3px;
-   box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
-   padding: 20px 30px;
- }
- #notify {
-   width: 50%;
-   margin-left: auto;
-   margin-right: auto;
- }
 
- #left {
-  width: 50%;
-  float: left;
-}
-#right {
-	width: 50%;
-  float: left;
-}
+  textarea {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 3px;
+    box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+    padding: 20px 30px;
+  }
+
+  button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 3px;
+    box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+    padding: 20px 30px;
+  }
+
+  #notify {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #left {
+    width: 50%;
+    float: left;
+  }
+
+  #right {
+    width: 50%;
+    float: left;
+  }
+
 </style>
 <script>
 
@@ -110,139 +114,124 @@
         toLog("cleaned line",line);
 
         while(line.match(/\&(.*?)\&/)){
-         var needed_variable = line.match(/\&(.*?)\&/)[1];
-         needed_variable = needed_variable.trim();
-         toLog("  needed_variable", needed_variable);
+          var needed_variable = line.match(/\&(.*?)\&/)[1];
+          needed_variable = needed_variable.trim();
+          toLog("  needed_variable", needed_variable);
 
-         var filter = new RegExp("^\ *"+needed_variable.trim());
-         toLog("    filter", filter);
+          var filter = new RegExp("^\ *"+needed_variable.trim());
+          toLog("    filter", filter);
 
-         var substitue_variable = "";
+          var substitue_variable = "";
 
-         for(var j = 0;j < lines.length;j++){
-          if(lines[j].match(filter)){
-           var target_line =  lines[j].toString();
-           toLog("      target_line", target_line);
+          for(var j = 0;j < lines.length;j++){
+            if(lines[j].match(filter)){
+              var target_line =  lines[j].toString();
+              toLog("      target_line", target_line);
 
-           substitue_variable = target_line.match(/=.*/)[0];
-           substitue_variable = substitue_variable.replace("=","");
-           substitue_variable = substitue_variable.replace('"','');
-           substitue_variable = substitue_variable.replace('"','');
-           substitue_variable = substitue_variable.replace(' ','');
-         }
-       }
-       toLog("        substitue_variable", substitue_variable);
+              substitue_variable = target_line.match(/=.*/)[0];
+              substitue_variable = substitue_variable.replace("=","");
+              substitue_variable = substitue_variable.replace('"','');
+              substitue_variable = substitue_variable.replace('"','');
+              substitue_variable = substitue_variable.replace(' ','');
+            }
+          }
+
+          toLog("        substitue_variable", substitue_variable);
 
 
-       if(substitue_variable.match(/\(/) ){
-        error('A',needed_variable,substitue_variable);
-        substitue_variable = needed_variable.trim();
-        toLog("        substitue_variable",substitue_variable)
+          if(substitue_variable.match(/\(/) ){
+            error('A',needed_variable,substitue_variable);
+            substitue_variable = needed_variable.trim();
+            toLog("        substitue_variable",substitue_variable)
+          }
+          else if(substitue_variable == "" ){
+            error('B',needed_variable,substitue_variable);
+            substitue_variable = needed_variable.trim();
+            toLog("        substitue_variable",substitue_variable)
+          }
+          else{
+            notify_text.innerHTML = notify_text.innerHTML + "Variable <font color='red'>"+ needed_variable + "</font> substitued with: <font color='blue'> " + substitue_variable +"</font><br></br>";
+          }
+
+          line = line.replace(/\&+(.*?\&)/g, substitue_variable);
+        }
+        output_text.value = output_text.value + line + "\n";
       }
-      else if(substitue_variable == "" ){
-        error('B',needed_variable,substitue_variable);
-        substitue_variable = needed_variable.trim();
-        toLog("        substitue_variable",substitue_variable)
-      }
-      else{
-        notify_text.innerHTML = notify_text.innerHTML + "Variable <font color='red'>"+ needed_variable + "</font> substitued with: <font color='blue'> " + substitue_variable +"</font><br></br>";
-      }
-
-      line = line.replace(/\&+(.*?\&)/g, substitue_variable);
     }
-    output_text.value = output_text.value + line + "\n";
   }
-}
-}
 
 //XML validation
 
 var xt="",h3OK=1
-function checkErrorXML(x)
-{
+function checkErrorXML(x){
   xt=""
   h3OK=1
   checkXML(x)
 }
 
-function checkXML(n)
-{
+function checkXML(n){
   var l,i,nam
   nam=n.nodeName
-  if (nam=="h3")
-  {
-    if (h3OK==0)
-    {
+  if (nam=="h3"){
+    if (h3OK==0){
       return;
     }
     h3OK=0
   }
-  if (nam=="#text")
-  {
+  if (nam=="#text"){
     xt=xt + n.nodeValue + "\n"
   }
   l=n.childNodes.length
-  for (i=0;i<l;i++)
-  {
+  for (i=0;i<l;i++){
     checkXML(n.childNodes[i])
   }
 }
 
-function validateXML(txt)
-{
-// code for IE
-if (window.ActiveXObject)
-{
-  var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-  xmlDoc.async=false;
-  xmlDoc.loadXML(document.all(txt).value);
-  if(xmlDoc.parseError.errorCode!=0)
-  {
-    txt="Error Code: " + xmlDoc.parseError.errorCode + "\n";
-    txt=txt+"Error Reason: " + xmlDoc.parseError.reason;
-    txt=txt+"Error Line: " + xmlDoc.parseError.line;
-    alert(txt);
-  }
-  else
-  {
-    alert("No errors found");
-  }
-}
-// code for Mozilla, Firefox, Opera, etc.
-else if (document.implementation.createDocument)
-{
-  try
-  {
-    var text=document.getElementById(txt).value;
-    var parser=new DOMParser();
-    var xmlDoc=parser.parseFromString(text,"application/xml");
-  }
-  catch(err)
-  {
-    alert(err.message)
-  }
+function validateXML(txt){
+    // code for IE
+    if (window.ActiveXObject){
+      var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+      xmlDoc.async=false;
+      xmlDoc.loadXML(document.all(txt).value);
+      if(xmlDoc.parseError.errorCode!=0){
+        txt="Error Code: " + xmlDoc.parseError.errorCode + "\n";
+        txt=txt+"Error Reason: " + xmlDoc.parseError.reason;
+        txt=txt+"Error Line: " + xmlDoc.parseError.line;
+        alert(txt);
+      }
+      else{
+        alert("No errors found");
+      }
+    }
+    // code for Mozilla, Firefox, Opera, etc.
+    else if (document.implementation.createDocument){
+      try{
+        var text=document.getElementById(txt).value;
+        var parser=new DOMParser();
+        var xmlDoc=parser.parseFromString(text,"application/xml");
+      }
+      catch(err){
+        alert(err.message)
+      }
 
-  if (xmlDoc.getElementsByTagName("parsererror").length>0)
-  {
-   checkErrorXML(xmlDoc.getElementsByTagName("parsererror")[0]);
-   alert(xt)
- }
- else
- {
-   alert("No errors found");
- }
-}
-else
-{
- alert('Your browser cannot handle XML validation');
-}
-}
+      if (xmlDoc.getElementsByTagName("parsererror").length>0){
+        checkErrorXML(xmlDoc.getElementsByTagName("parsererror")[0]);
+        alert(xt)
+      }
+      else{
+        alert("No errors found");
+      }
+    }
+    else{
+      alert('Your browser cannot handle XML validation');
+    }
+  }
 
 
 
 </script>
 <body>
-  <div id="header"><h1>XML Extractor</h1></div>
+  <div id="header"><h1><font color='white'>XML Extractor</font></h1></div>
   <div id="left">
     <textarea wrap="off" id="input" rows="40" cols="120" placeholder="Paste VBScript here ..."></textarea><br><br>
     <button id ="button" value="clickme" onclick="parse();" type="button">Extract the XML request</button><br><br>
