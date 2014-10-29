@@ -1,0 +1,152 @@
+<!--
+# XML Extractor
+## Kyle Scully 2014
+	* Made to extract XML requests from code that builds an XML request
+
+	 -->
+<!DOCTYPE html>
+<html>
+<style>
+body {
+    background-color: #b0c4de;
+}
+#header {
+    display: block;
+    margin-left: 44%;
+	margin-right: auto;
+}
+textarea {
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+button {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+#notify {
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#left {
+    width: 50%;
+    float: left;
+}
+#right {
+	width: 50%;
+    float: left;
+}
+</style>
+<script>
+
+	var DEBUG = false;
+
+	function toLog(tag,variable){
+		if (DEBUG==true){
+			console.log(tag + "=" + variable);
+		}
+	}
+
+	function error(code,expected,got){
+		var notify_text = document.getElementById("notify");
+
+		switch(code){
+			case 'A':
+			notify_text.innerHTML = "<b>"+ notify_text.innerHTML + "Error: variable<font color='red'>"+ expected + "</font>could not be determined from: <font color='blue'>" + got +"</font><br></br> </b>";
+			break;
+
+			case 'B':
+			notify_text.innerHTML = "<b>" + notify_text.innerHTML + "Error: Definition for variable<font color='red'>"+ expected + "</font>could not be found <br></br> </b>";
+			break;
+
+			default:
+			console.log("error code not recognized");
+		}
+		console.log(expected+"could not be determine");
+	}
+
+	function parse(){
+		var input_text = document.getElementById("input");
+		var output_text = document.getElementById("output");
+		var notify_text = document.getElementById("notify");
+		output_text.value = "";
+		notify_text.innerHTML = null;
+
+
+		var lines = input_text.value.split('\n');
+
+		for(var i = 0;i < lines.length;i++){
+
+			var request = new RegExp("^XMLRequest");
+
+			if(lines[i].match(request)){
+				line = lines[i].toString()
+
+				line = line.replace(/^[^\<]*\</, '<');
+				line = line.replace(/\"\"/g, '"');
+				line = line.replace(/\"\"/g, '"');
+				line = line.replace(/\"\</g, '<');
+				line = line.replace(/\>\"/g, '>');
+
+				while(line.match(/\&(.*?)\&/)){
+					var needed_variable = line.match(/\&(.*?)\&/)[1];
+					toLog("needed_variable", needed_variable);
+
+					var filter = new RegExp("^\ *"+needed_variable.trim());
+					toLog("filter", filter);
+
+					var substitue_variable = "";
+
+					for(var j = 0;j < lines.length;j++){
+						if(lines[j].match(filter)){
+							var target_line =  lines[j].toString();
+							toLog("target_line", target_line);
+
+							substitue_variable = target_line.match(/=.*/)[0];
+							substitue_variable = substitue_variable.replace("=","");
+							substitue_variable = substitue_variable.replace('"','');
+							substitue_variable = substitue_variable.replace('"','');
+							substitue_variable = substitue_variable.trim();
+						}
+					}
+					toLog("substitue_variable", substitue_variable);
+
+
+					if(substitue_variable.match(/\(/) ){
+						error('A',needed_variable,substitue_variable);
+						substitue_variable = needed_variable;
+					}
+					else if(substitue_variable == "" ){
+						error('B',needed_variable,substitue_variable);
+						substitue_variable = needed_variable;
+					}
+					else{
+						notify_text.innerHTML = notify_text.innerHTML + "Variable<font color='red'>"+ needed_variable + "</font>substitued with: <font color='blue'>" + substitue_variable +"</font><br></br>";
+					}
+
+					line = line.replace(/\&+(.*?\&)/, substitue_variable)
+				}
+				output_text.value = output_text.value + line + "\n";
+			}
+		}
+	}
+
+</script>
+<body>
+<div id="header"><h1>XML Extractor</h1></div>
+<div id="left">
+		<textarea wrap="off" id="input" rows="40" cols="120" placeholder="Paste VBScript here ..."></textarea><br><br>
+		<button id ="button" value="clickme" onclick="parse();" type="button">Extract the XML request</button><br><br>
+</div>
+<div id="right">
+		<textarea wrap="off" id="output" rows="40" cols="120" placeholder="Your XML Request will show up here" readonly></textarea><br><br>
+		<div id="notify"> </div>
+	</div>
+</body>
+
+
+
+</html>
