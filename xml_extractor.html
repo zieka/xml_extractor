@@ -42,11 +42,11 @@ button {
 </style>
 <script>
 
-	var DEBUG = false;
+	var DEBUG = true;
 
 	function toLog(tag,variable){
 		if (DEBUG==true){
-			console.log(tag + "=" + variable);
+			console.log(tag + " : " + variable);
 		}
 	}
 
@@ -55,17 +55,17 @@ button {
 
 		switch(code){
 			case 'A':
-			notify_text.innerHTML = "<b>"+ notify_text.innerHTML + "Error: variable<font color='red'>"+ expected + "</font>could not be determined from: <font color='blue'>" + got +"</font><br></br> </b>";
+			notify_text.innerHTML = "<b>"+ notify_text.innerHTML + "Error: variable <font color='red'>"+ expected + "</font> could not be determined from: <font color='blue'>" + got +"</font><br></br> </b>";
 			break;
 
 			case 'B':
-			notify_text.innerHTML = "<b>" + notify_text.innerHTML + "Error: Definition for variable<font color='red'>"+ expected + "</font>could not be found <br></br> </b>";
+			notify_text.innerHTML = "<b>" + notify_text.innerHTML + "Error: Definition for variable <font color='red'>"+ expected + "</font> could not be found <br></br> </b>";
 			break;
 
 			default:
 			console.log("error code not recognized");
 		}
-		console.log(expected+"could not be determine");
+		console.log("          "+expected+" could not be determine from: "+got);
 	}
 
 	function parse(){
@@ -85,54 +85,144 @@ button {
 			if(lines[i].match(request)){
 				line = lines[i].toString()
 
-				line = line.replace(/^[^\<]*\</, '<');
+				line = line.replace(/^[^\<]*\</g, '<');
 				line = line.replace(/\"\"/g, '"');
 				line = line.replace(/\"\"/g, '"');
-				line = line.replace(/\"\</g, '<');
-				line = line.replace(/\>\"/g, '>');
+				line = line.replace(/\ *\"\</g, '<');
+				line = line.replace(/\>\"\ */g, '>');
+        line = line.replace(/\ *&\ */g, '&');
+        toLog("cleaned line",line);
 
 				while(line.match(/\&(.*?)\&/)){
 					var needed_variable = line.match(/\&(.*?)\&/)[1];
-					toLog("needed_variable", needed_variable);
+          needed_variable = needed_variable.trim();
+					toLog("  needed_variable", needed_variable);
 
 					var filter = new RegExp("^\ *"+needed_variable.trim());
-					toLog("filter", filter);
+					toLog("    filter", filter);
 
 					var substitue_variable = "";
 
 					for(var j = 0;j < lines.length;j++){
 						if(lines[j].match(filter)){
 							var target_line =  lines[j].toString();
-							toLog("target_line", target_line);
+							toLog("      target_line", target_line);
 
 							substitue_variable = target_line.match(/=.*/)[0];
 							substitue_variable = substitue_variable.replace("=","");
 							substitue_variable = substitue_variable.replace('"','');
 							substitue_variable = substitue_variable.replace('"','');
-							substitue_variable = substitue_variable.trim();
+							substitue_variable = substitue_variable.replace(' ','');
 						}
 					}
-					toLog("substitue_variable", substitue_variable);
+					toLog("        substitue_variable", substitue_variable);
 
 
 					if(substitue_variable.match(/\(/) ){
 						error('A',needed_variable,substitue_variable);
-						substitue_variable = needed_variable;
+						substitue_variable = needed_variable.trim();
+            toLog("        substitue_variable",substitue_variable)
 					}
 					else if(substitue_variable == "" ){
 						error('B',needed_variable,substitue_variable);
-						substitue_variable = needed_variable;
+						substitue_variable = needed_variable.trim();
+            toLog("        substitue_variable",substitue_variable)
 					}
 					else{
-						notify_text.innerHTML = notify_text.innerHTML + "Variable<font color='red'>"+ needed_variable + "</font>substitued with: <font color='blue'>" + substitue_variable +"</font><br></br>";
+						notify_text.innerHTML = notify_text.innerHTML + "Variable <font color='red'>"+ needed_variable + "</font> substitued with: <font color='blue'> " + substitue_variable +"</font><br></br>";
 					}
 
-					line = line.replace(/\&+(.*?\&)/, substitue_variable)
+					line = line.replace(/\&+(.*?\&)/g, substitue_variable);
 				}
 				output_text.value = output_text.value + line + "\n";
 			}
 		}
 	}
+
+//XML validation
+
+var xt="",h3OK=1
+function checkErrorXML(x)
+{
+xt=""
+h3OK=1
+checkXML(x)
+}
+
+function checkXML(n)
+{
+var l,i,nam
+nam=n.nodeName
+if (nam=="h3")
+  {
+  if (h3OK==0)
+    {
+    return;
+    }
+  h3OK=0
+  }
+if (nam=="#text")
+  {
+  xt=xt + n.nodeValue + "\n"
+  }
+l=n.childNodes.length
+for (i=0;i<l;i++)
+  {
+  checkXML(n.childNodes[i])
+  }
+}
+
+function validateXML(txt)
+{
+// code for IE
+if (window.ActiveXObject)
+  {
+  var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+  xmlDoc.async=false;
+  xmlDoc.loadXML(document.all(txt).value);
+  if(xmlDoc.parseError.errorCode!=0)
+    {
+    txt="Error Code: " + xmlDoc.parseError.errorCode + "\n";
+    txt=txt+"Error Reason: " + xmlDoc.parseError.reason;
+    txt=txt+"Error Line: " + xmlDoc.parseError.line;
+    alert(txt);
+    }
+  else
+    {
+    alert("No errors found");
+    }
+  }
+// code for Mozilla, Firefox, Opera, etc.
+else if (document.implementation.createDocument)
+  {
+  try
+  {
+  var text=document.getElementById(txt).value;
+  var parser=new DOMParser();
+  var xmlDoc=parser.parseFromString(text,"application/xml");
+  }
+  catch(err)
+  {
+  alert(err.message)
+  }
+
+if (xmlDoc.getElementsByTagName("parsererror").length>0)
+   {
+   checkErrorXML(xmlDoc.getElementsByTagName("parsererror")[0]);
+   alert(xt)
+   }
+ else
+   {
+   alert("No errors found");
+   }
+ }
+else
+ {
+ alert('Your browser cannot handle XML validation');
+ }
+}
+
+
 
 </script>
 <body>
@@ -142,7 +232,8 @@ button {
 		<button id ="button" value="clickme" onclick="parse();" type="button">Extract the XML request</button><br><br>
 </div>
 <div id="right">
-		<textarea wrap="off" id="output" rows="40" cols="120" placeholder="Your XML Request will show up here" readonly></textarea><br><br>
+		<textarea wrap="off" id="output" rows="40" cols="120" placeholder="Your XML Request will show up here" ></textarea><br><br>
+    <button value="Validate" onclick="validateXML('output')">Click to see if this is valid XML</button><br><br>
 		<div id="notify"> </div>
 	</div>
 </body>
