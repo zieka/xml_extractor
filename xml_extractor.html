@@ -26,6 +26,7 @@
   }
 
   textarea {
+    width: 92%;
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -233,11 +234,11 @@ function validateXML(txt){
 <body>
   <div id="header"><h1><font color='white'>XML Extractor</font></h1></div>
   <div id="left">
-    <textarea wrap="off" id="input" rows="40" cols="120" placeholder="Paste VBScript here ..."></textarea><br><br>
+    <textarea wrap="off" id="input" rows="25" cols="120" placeholder="Paste VBScript here ..."></textarea><br><br>
     <button id ="button" value="clickme" onclick="parse();" type="button">Extract the XML request</button><br><br>
   </div>
   <div id="right">
-    <textarea wrap="off" id="output" rows="40" cols="120" placeholder="Your XML Request will show up here" ></textarea><br><br>
+    <textarea wrap="off" id="output" rows="25" cols="120" placeholder="Your XML Request will show up here" ></textarea><br><br>
     <button value="Validate" onclick="validateXML('output')">Click to see if this is valid XML</button><br><br>
     <div id="notify"> </div>
   </div>
