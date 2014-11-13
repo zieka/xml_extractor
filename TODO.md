@@ -1,6 +1,5 @@
 # TODO
 
-* strip vbcrlf
 * IE test
 
 ------
@@ -10,3 +9,4 @@
 * replace variables
 * debug options
 * css
+* strip vbcrlf

@@ -112,6 +112,7 @@
 				line = line.replace(/\ *\"\</g, '<');
 				line = line.replace(/\>\"\ */g, '>');
         line = line.replace(/\ *&\ */g, '&');
+        line = line.replace('&vbCrLf', '');
         toLog("cleaned line",line);
 
         while(line.match(/\&(.*?)\&/)){
