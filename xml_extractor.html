@@ -63,6 +63,18 @@
     float: left;
   }
 
+  div[id="notify"] {
+    width: 100%;
+    max-height: 125px;
+    overflow-y: scroll;
+    margin: 50px auto;
+    text-align: center;
+    background: white;
+    border: 0 none;
+    border-radius: 3px;
+    box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+    padding: 20px 30px;
+  }
 </style>
 <script>
 
@@ -79,7 +91,7 @@
 
 		switch(code){
 			case 'A':
-			notify_text.innerHTML = "<b>"+ notify_text.innerHTML + "Error: variable <font color='red'>"+ expected + "</font> could not be determined from: <font color='blue'>" + got +"</font><br></br> </b>";
+			notify_text.innerHTML = "<b>" + notify_text.innerHTML + "Error: variable <font color='red'>"+ expected + "</font> could not be determined from: <font color='blue'>" + got +"</font><br></br> </b>";
 			break;
 
 			case 'B':
@@ -155,7 +167,7 @@
             toLog("        substitue_variable",substitue_variable)
           }
           else{
-            notify_text.innerHTML = notify_text.innerHTML + "Variable <font color='red'>"+ needed_variable + "</font> substitued with: <font color='blue'> " + substitue_variable +"</font><br></br>";
+            notify_text.innerHTML = notify_text.innerHTML + "<b> Variable <font color='red'>"+ needed_variable + "</font> substitued with: <font color='blue'> " + substitue_variable +"</font><br></br></b>";
           }
 
           line = line.replace(/\&+(.*?\&)/g, substitue_variable);
@@ -243,8 +255,10 @@ function validateXML(txt){
   </div>
   <div id="right">
     <textarea wrap="off" id="output" rows="25" cols="120" placeholder="Your XML Request will show up here" ></textarea><br><br>
-    <button value="Validate" onclick="validateXML('output')">Click to see if this is valid XML</button><br><br>
-    <div id="notify"> </div>
+    <button value="Validate" onclick="validateXML('output')">Click to see if this is valid XML</button>
+    <div id="notify" >
+    <h2>Substitutions Will Be Here</h2>
+    </div>
   </div>
 </body>
 
