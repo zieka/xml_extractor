@@ -23,9 +23,9 @@
 
   #header {
     display: block;
-    margin-left: 44%;
+    margin-left: auto;
     margin-right: auto;
-    width:240px;
+    width:540px;
   }
 
   textarea {
@@ -56,15 +56,16 @@
   #left {
     width: 50%;
     float: left;
+    margin-left: auto;
   }
 
   #right {
     width: 50%;
     float: left;
+    margin-right: auto;
   }
 
   div[id="notify"] {
-    width: 100%;
     max-height: 125px;
     overflow-y: scroll;
     margin: 50px auto;
@@ -245,18 +246,22 @@ function validateXML(txt){
   }
 
 
-
 </script>
+<link href="http://usablica.github.io/intro.js/introjs.css" rel="stylesheet">
+<link href="http://usablica.github.io/intro.js/example/assets/css/bootstrap-responsive.min.css" rel="stylesheet">
+<script type="text/javascript" src="http://usablica.github.io/intro.js/intro.js"></script>
+
 <body>
-  <div id="header"><h1 align="center"><font color='white'>XML Extractor</font></h1></div>
+  <div id="header" onclick="javascript:introJs().setOption('showBullets', true).start();" href="javascript:void(0);"><h1 align="center"><font color='white'>XML Extractor</font>
+    </h1></div>
   <div id="left">
-    <textarea wrap="off" id="input" rows="25" cols="120" placeholder="Paste VBScript here ..."></textarea><br><br>
-    <button id ="button" value="clickme" onclick="parse();" type="button">Extract the XML request</button><br><br>
+    <textarea data-step="1" data-intro="Copy and paste your VB Script into this box.  Currently it is assumed that the xml request is being built into a variable 'XMLRequest' " data-position='right' wrap="off" id="input" rows="25" cols="120" placeholder="Paste VBScript here ..."></textarea><br><br>
+    <button id ="button" data-step="2" data-intro="Once you have your script pasted in click this buttom to extract details on the XML" data-position='right' value="clickme" onclick="parse();" type="button">Extract the XML request</button><br><br>
   </div>
   <div id="right">
-    <textarea wrap="off" id="output" rows="25" cols="120" placeholder="Your XML Request will show up here" ></textarea><br><br>
-    <button value="Validate" onclick="validateXML('output')">Click to see if this is valid XML</button>
-    <div id="notify" >
+    <textarea data-step="3" data-intro="Here you will see the XML request cleaned up and ready to be used in a direct call" data-position='left' wrap="off" id="output" rows="25" cols="120" placeholder="Your XML Request will show up here" ></textarea><br><br>
+    <button value="Validate" onclick="validateXML('output')" data-step="4" data-intro="Click on this button to run a test to see if the XML has valid XML syntax" data-position='left'>Click to see if this is valid XML</button>
+    <div id="notify" data-step="5" data-intro="Here you will see the variables in the script that were substitued in or if it can't find the right variable it will tell you what it found!" data-position='left'>
     <h2>Substitutions Will Be Here</h2>
     </div>
   </div>
@@ -265,3 +270,10 @@ function validateXML(txt){
 
 
 </html>
+
+
+
+
+<a class="btn btn-large btn-success" onclick="javascript:introJs().setOption('showBullets', false).start();" href="javascript:void(0);">
+?
+</a>
