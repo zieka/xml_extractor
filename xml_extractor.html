@@ -1,34 +1,31 @@
 <!--
 # XML Extractor
 ## Kyle Scully 2014
-	* Made to extract XML requests from code that builds an XML request
+  * Made to extract XML requests from code that builds an XML request
 -->
 
 <!DOCTYPE html>
 <html>
 <style>
-  /*custom font*/
-  @import url(http://fonts.googleapis.com/css?family=Montserrat);
+/*custom font*/
 
-  html {
+@import url(http://fonts.googleapis.com/css?family=Montserrat);
+html {
     height: 100%;
-    background:
-    linear-gradient(rgba(22, 22, 22, 0.7), rgba(39, 177, 218, 0.3) ),
-    url('http://thecodeplayer.com/uploads/media/gs.png');
-  }
-  
-  body {
+    background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(39, 177, 218, 0.2)), url('http://thecodeplayer.com/uploads/media/gs.png');
+    margin: 0;
+    background-attachment: fixed;
+}
+body {
     font-family: montserrat, arial, verdana;
-  }
-
-  #header {
+}
+#header {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width:540px;
-  }
-
-  textarea {
+    width: 540px;
+}
+textarea {
     width: 92%;
     display: block;
     margin-left: auto;
@@ -36,36 +33,31 @@
     border-radius: 3px;
     box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
     padding: 20px 30px;
-  }
-
-  button {
+}
+button {
     display: block;
     margin-left: auto;
     margin-right: auto;
     border-radius: 3px;
     box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
     padding: 20px 30px;
-  }
-
-  #notify {
+}
+#notify {
     width: 50%;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  #left {
+}
+#left {
     width: 50%;
     float: left;
     margin-left: auto;
-  }
-
-  #right {
+}
+#right {
     width: 50%;
     float: left;
     margin-right: auto;
-  }
-
-  div[id="notify"] {
+}
+div[id="notify"] {
     max-height: 125px;
     overflow-y: scroll;
     margin: 50px auto;
@@ -75,205 +67,199 @@
     border-radius: 3px;
     box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
     padding: 20px 30px;
-  }
+}
 </style>
 <script>
+var DEBUG = true;
 
-	var DEBUG = true;
-
-	function toLog(tag,variable){
-		if (DEBUG==true){
-			console.log(tag + " : " + variable);
-		}
-	}
-
-	function error(code,expected,got){
-		var notify_text = document.getElementById("notify");
-
-		switch(code){
-			case 'A':
-			notify_text.innerHTML = "<b>" + notify_text.innerHTML + "Error: variable <font color='red'>"+ expected + "</font> could not be determined from: <font color='blue'>" + got +"</font><br></br> </b>";
-			break;
-
-			case 'B':
-			notify_text.innerHTML = "<b>" + notify_text.innerHTML + "Error: Definition for variable <font color='red'>"+ expected + "</font> could not be found <br></br> </b>";
-			break;
-
-			default:
-			console.log("error code not recognized");
-		}
-		console.log("          "+expected+" could not be determine from: "+got);
-	}
-
-	function parse(){
-		var input_text = document.getElementById("input");
-		var output_text = document.getElementById("output");
-		var notify_text = document.getElementById("notify");
-		output_text.value = "";
-		notify_text.innerHTML = null;
-
-
-		var lines = input_text.value.split('\n');
-
-		for(var i = 0;i < lines.length;i++){
-
-			var request = new RegExp("^XMLRequest");
-
-			if(lines[i].match(request)){
-				line = lines[i].toString()
-
-				line = line.replace(/^[^\<]*\</g, '<');
-				line = line.replace(/\"\"/g, '"');
-				line = line.replace(/\"\"/g, '"');
-				line = line.replace(/\ *\"\</g, '<');
-				line = line.replace(/\>\"\ */g, '>');
-        line = line.replace(/\ *&\ */g, '&');
-        line = line.replace('&vbCrLf', '');
-        toLog("cleaned line",line);
-
-        while(line.match(/\&(.*?)\&/)){
-          var needed_variable = line.match(/\&(.*?)\&/)[1];
-          needed_variable = needed_variable.trim();
-          toLog("  needed_variable", needed_variable);
-
-          var filter = new RegExp("^\ *"+needed_variable.trim());
-          toLog("    filter", filter);
-
-          var substitue_variable = "";
-
-          for(var j = 0;j < lines.length;j++){
-            if(lines[j].match(filter)){
-              var target_line =  lines[j].toString();
-              toLog("      target_line", target_line);
-
-              substitue_variable = target_line.match(/=.*/)[0];
-              substitue_variable = substitue_variable.replace("=","");
-              substitue_variable = substitue_variable.replace('"','');
-              substitue_variable = substitue_variable.replace('"','');
-              substitue_variable = substitue_variable.replace(' ','');
-            }
-          }
-
-          toLog("        substitue_variable", substitue_variable);
-
-
-          if(substitue_variable.match(/\(/) ){
-            error('A',needed_variable,substitue_variable);
-            substitue_variable = needed_variable.trim();
-            toLog("        substitue_variable",substitue_variable)
-          }
-          else if(substitue_variable == "" ){
-            error('B',needed_variable,substitue_variable);
-            substitue_variable = needed_variable.trim();
-            toLog("        substitue_variable",substitue_variable)
-          }
-          else{
-            notify_text.innerHTML = notify_text.innerHTML + "<b> Variable <font color='red'>"+ needed_variable + "</font> substitued with: <font color='blue'> " + substitue_variable +"</font><br></br></b>";
-          }
-
-          line = line.replace(/\&+(.*?\&)/g, substitue_variable);
-        }
-        output_text.value = output_text.value + line + "\n";
-      }
+function toLog(tag, variable) {
+    if (DEBUG == true) {
+        console.log(tag + " : " + variable);
     }
-  }
+}
+
+function error(code, expected, got) {
+    var notify_text = document.getElementById("notify");
+
+    switch (code) {
+        case 'A':
+            notify_text.innerHTML = "<b>" + notify_text.innerHTML + "Error: variable <font color='red'>" + expected + "</font> could not be determined from: <font color='blue'>" + got + "</font><br></br> </b>";
+            break;
+
+        case 'B':
+            notify_text.innerHTML = "<b>" + notify_text.innerHTML + "Error: Definition for variable <font color='red'>" + expected + "</font> could not be found <br></br> </b>";
+            break;
+
+        default:
+            console.log("error code not recognized");
+    }
+    console.log("          " + expected + " could not be determine from: " + got);
+}
+
+function parse() {
+    var input_text = document.getElementById("input");
+    var output_text = document.getElementById("output");
+    var notify_text = document.getElementById("notify");
+    output_text.value = "";
+    notify_text.innerHTML = null;
+
+
+    var lines = input_text.value.split('\n');
+
+    for (var i = 0; i < lines.length; i++) {
+
+        var request = new RegExp("^XMLRequest");
+
+        if (lines[i].match(request)) {
+            line = lines[i].toString()
+
+            line = line.replace(/^[^\<]*\</g, '<');
+            line = line.replace(/\"\"/g, '"');
+            line = line.replace(/\"\"/g, '"');
+            line = line.replace(/\ *\"\</g, '<');
+            line = line.replace(/\>\"\ */g, '>');
+            line = line.replace(/\ *&\ */g, '&');
+            line = line.replace('&vbCrLf', '');
+            toLog("cleaned line", line);
+
+            while (line.match(/\&(.*?)\&/)) {
+                var needed_variable = line.match(/\&(.*?)\&/)[1];
+                needed_variable = needed_variable.trim();
+                toLog("  needed_variable", needed_variable);
+
+                var filter = new RegExp("^\ *" + needed_variable.trim());
+                toLog("    filter", filter);
+
+                var substitue_variable = "";
+
+                for (var j = 0; j < lines.length; j++) {
+                    if (lines[j].match(filter)) {
+                        var target_line = lines[j].toString();
+                        toLog("      target_line", target_line);
+
+                        substitue_variable = target_line.match(/=.*/)[0];
+                        substitue_variable = substitue_variable.replace("=", "");
+                        substitue_variable = substitue_variable.replace('"', '');
+                        substitue_variable = substitue_variable.replace('"', '');
+                        substitue_variable = substitue_variable.replace(' ', '');
+                    }
+                }
+
+                toLog("        substitue_variable", substitue_variable);
+
+
+                if (substitue_variable.match(/\(/)) {
+                    error('A', needed_variable, substitue_variable);
+                    substitue_variable = needed_variable.trim();
+                    toLog("        substitue_variable", substitue_variable)
+                } else if (substitue_variable == "") {
+                    error('B', needed_variable, substitue_variable);
+                    substitue_variable = needed_variable.trim();
+                    toLog("        substitue_variable", substitue_variable)
+                } else {
+                    notify_text.innerHTML = notify_text.innerHTML + "<b> Variable <font color='red'>" + needed_variable + "</font> substitued with: <font color='blue'> " + substitue_variable + "</font><br></br></b>";
+                }
+
+                line = line.replace(/\&+(.*?\&)/g, substitue_variable);
+            }
+            output_text.value = output_text.value + line + "\n";
+        }
+    }
+}
 
 //XML validation
 
-var xt="",h3OK=1
-function checkErrorXML(x){
-  xt=""
-  h3OK=1
-  checkXML(x)
+var xt = "",
+    h3OK = 1
+
+function checkErrorXML(x) {
+    xt = ""
+    h3OK = 1
+    checkXML(x)
 }
 
-function checkXML(n){
-  var l,i,nam
-  nam=n.nodeName
-  if (nam=="h3"){
-    if (h3OK==0){
-      return;
+function checkXML(n) {
+    var l, i, nam
+    nam = n.nodeName
+    if (nam == "h3") {
+        if (h3OK == 0) {
+            return;
+        }
+        h3OK = 0
     }
-    h3OK=0
-  }
-  if (nam=="#text"){
-    xt=xt + n.nodeValue + "\n"
-  }
-  l=n.childNodes.length
-  for (i=0;i<l;i++){
-    checkXML(n.childNodes[i])
-  }
+    if (nam == "#text") {
+        xt = xt + n.nodeValue + "\n"
+    }
+    l = n.childNodes.length
+    for (i = 0; i < l; i++) {
+        checkXML(n.childNodes[i])
+    }
 }
 
-function validateXML(txt){
+function validateXML(txt) {
     // code for IE
-    if (window.ActiveXObject){
-      var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-      xmlDoc.async=false;
-      xmlDoc.loadXML(document.all(txt).value);
-      if(xmlDoc.parseError.errorCode!=0){
-        txt="Error Code: " + xmlDoc.parseError.errorCode + "\n";
-        txt=txt+"Error Reason: " + xmlDoc.parseError.reason;
-        txt=txt+"Error Line: " + xmlDoc.parseError.line;
-        alert(txt);
-      }
-      else{
-        alert("No errors found");
-      }
+    if (window.ActiveXObject) {
+        var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+        xmlDoc.async = false;
+        xmlDoc.loadXML(document.all(txt).value);
+        if (xmlDoc.parseError.errorCode != 0) {
+            txt = "Error Code: " + xmlDoc.parseError.errorCode + "\n";
+            txt = txt + "Error Reason: " + xmlDoc.parseError.reason;
+            txt = txt + "Error Line: " + xmlDoc.parseError.line;
+            alert(txt);
+        } else {
+            alert("No errors found");
+        }
     }
     // code for Mozilla, Firefox, Opera, etc.
-    else if (document.implementation.createDocument){
-      try{
-        var text=document.getElementById(txt).value;
-        var parser=new DOMParser();
-        var xmlDoc=parser.parseFromString(text,"application/xml");
-      }
-      catch(err){
-        alert(err.message)
-      }
+    else if (document.implementation.createDocument) {
+        try {
+            var text = document.getElementById(txt).value;
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(text, "application/xml");
+        } catch (err) {
+            alert(err.message)
+        }
 
-      if (xmlDoc.getElementsByTagName("parsererror").length>0){
-        checkErrorXML(xmlDoc.getElementsByTagName("parsererror")[0]);
-        alert(xt)
-      }
-      else{
-        alert("No errors found");
-      }
+        if (xmlDoc.getElementsByTagName("parsererror").length > 0) {
+            checkErrorXML(xmlDoc.getElementsByTagName("parsererror")[0]);
+            alert(xt)
+        } else {
+            alert("No errors found");
+        }
+    } else {
+        alert('Your browser cannot handle XML validation');
     }
-    else{
-      alert('Your browser cannot handle XML validation');
-    }
-  }
-
-
+}
 </script>
 <link href="http://usablica.github.io/intro.js/introjs.css" rel="stylesheet">
 <link href="http://usablica.github.io/intro.js/example/assets/css/bootstrap-responsive.min.css" rel="stylesheet">
 <script type="text/javascript" src="http://usablica.github.io/intro.js/intro.js"></script>
 
 <body>
-  <div id="header" onclick="javascript:introJs().setOption('showBullets', true).start();" href="javascript:void(0);"><h1 align="center"><font color='white'>XML Extractor</font>
-    </h1></div>
-  <div id="left">
-    <textarea data-step="1" data-intro="Copy and paste your VB Script into this box.  Currently it is assumed that the xml request is being built into a variable 'XMLRequest' " data-position='right' wrap="off" id="input" rows="25" cols="120" placeholder="Paste VBScript here ..."></textarea><br><br>
-    <button id ="button" data-step="2" data-intro="Once you have your script pasted in click this buttom to extract details on the XML" data-position='right' value="clickme" onclick="parse();" type="button">Extract the XML request</button><br><br>
-  </div>
-  <div id="right">
-    <textarea data-step="3" data-intro="Here you will see the XML request cleaned up and ready to be used in a direct call" data-position='left' wrap="off" id="output" rows="25" cols="120" placeholder="Your XML Request will show up here" ></textarea><br><br>
-    <button value="Validate" onclick="validateXML('output')" data-step="4" data-intro="Click on this button to run a test to see if the XML has valid XML syntax" data-position='left'>Click to see if this is valid XML</button>
-    <div id="notify" data-step="5" data-intro="Here you will see the variables in the script that were substitued in or if it can't find the right variable it will tell you what it found!" data-position='left'>
-    <h2>Substitutions Will Be Here</h2>
+    <div id="header" onclick="javascript:introJs().setOption('showBullets', true).start();" href="javascript:void(0);">
+        <h1 align="center"><font color='white'>XML Extractor</font>
+    </h1>
     </div>
-  </div>
+    <div id="left">
+        <textarea data-step="1" data-intro="Copy and paste your VB Script into this box.  Currently it is assumed that the xml request is being built into a variable 'XMLRequest' " data-position='right' wrap="off" id="input" rows="25" cols="120" placeholder="Paste VBScript here ..."></textarea>
+        <br>
+        <br>
+        <button id="button" data-step="2" data-intro="Once you have your script pasted in click this buttom to extract details on the XML" data-position='right' value="clickme" onclick="parse();" type="button">Extract the XML request</button>
+        <br>
+        <br>
+    </div>
+    <div id="right">
+        <textarea data-step="3" data-intro="Here you will see the XML request cleaned up and ready to be used in a direct call" data-position='left' wrap="off" id="output" rows="25" cols="120" placeholder="Your XML Request will show up here"></textarea>
+        <br>
+        <br>
+        <button value="Validate" onclick="validateXML('output')" data-step="4" data-intro="Click on this button to run a test to see if the XML has valid XML syntax" data-position='left'>Click to see if this is valid XML</button>
+        <div id="notify" data-step="5" data-intro="Here you will see the variables in the script that were substitued in or if it can't find the right variable it will tell you what it found!" data-position='left'>
+            <h2>Substitutions Will Be Here</h2>
+        </div>
+    </div>
 </body>
 
 
 
 </html>
-
-
-
-
-<a class="btn btn-large btn-success" onclick="javascript:introJs().setOption('showBullets', false).start();" href="javascript:void(0);">
-?
-</a>
